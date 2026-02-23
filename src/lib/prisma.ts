@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
-import pg from 'pg';
+import { Pool } from 'pg';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
@@ -10,7 +10,7 @@ if (!databaseUrl) {
   throw new Error('DATABASE_URL is not defined in environment variables');
 }
 
-const pool = new pg.Pool({ connectionString: databaseUrl });
+const pool = new Pool({ connectionString: databaseUrl });
 const adapter = new PrismaPg(pool);
 
 export const prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
