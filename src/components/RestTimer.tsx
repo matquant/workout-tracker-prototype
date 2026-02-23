@@ -9,6 +9,30 @@ interface RestTimerProps {
   onFinish?: () => void;
 }
 
+function playBeepTone() {
+  if (typeof window === 'undefined') return;
+
+  const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AudioContextClass) return;
+
+  const ctx = new AudioContextClass();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.value = 880;
+  gain.gain.value = 0.08;
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(ctx.currentTime + 0.2);
+  osc.onended = () => {
+    void ctx.close();
+  };
+}
+
 export function RestTimer({ duration, onClose, onFinish }: RestTimerProps) {
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(true);
@@ -22,8 +46,7 @@ export function RestTimer({ duration, onClose, onFinish }: RestTimerProps) {
         if (prev <= 1) {
           if (soundEnabled) {
             try {
-              const audio = new Audio('/beep.mp3');
-              audio.play();
+              playBeepTone();
             } catch (e) {
               console.error("Audio play failed", e);
             }
