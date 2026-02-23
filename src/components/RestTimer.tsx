@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Play, RotateCcw, X, Volume2, VolumeX } from 'lucide-react';
-import { cn } from '../lib/utils';
 
 interface RestTimerProps {
   duration: number; // in seconds
@@ -16,24 +15,27 @@ export function RestTimer({ duration, onClose, onFinish }: RestTimerProps) {
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isRunning && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft(prev => prev - 1);
-      }, 1000);
-    } else if (timeLeft === 0) {
-      if (soundEnabled) {
-        // Simple beep using Audio API if browser supports
-        try {
-          const audio = new Audio('/beep.mp3'); // Need to add beep.mp3 to public folder
-          audio.play();
-        } catch (e) {
-          console.error("Audio play failed", e);
+    if (!isRunning || timeLeft <= 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          if (soundEnabled) {
+            try {
+              const audio = new Audio('/beep.mp3');
+              audio.play();
+            } catch (e) {
+              console.error("Audio play failed", e);
+            }
+          }
+          if (onFinish) onFinish();
+          setIsRunning(false);
+          return 0;
         }
-      }
-      if (onFinish) onFinish();
-      setIsRunning(false);
-    }
+        return prev - 1;
+      });
+    }, 1000);
+
     return () => clearInterval(timer);
   }, [isRunning, timeLeft, onFinish, soundEnabled]);
 

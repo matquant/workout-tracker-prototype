@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const inputFile = path.join(__dirname, '../workout_plan.txt');
 const outputFile = path.join(__dirname, '../src/programs/program-v1.ts');

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Edit2, Play } from 'lucide-react';
+import { Check, Edit2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SetSchema } from '@/types/program';
 

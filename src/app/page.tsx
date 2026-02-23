@@ -1,14 +1,11 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { activeProgram } from '../programs';
 import { cn } from '../lib/utils';
 import { Calendar, Play, BarChart2 } from 'lucide-react';
 
 export default function Home() {
-  const { data: session } = useSession();
-
   // In real app, we would calculate "next workout" from DB history.
   // For prototype, we default to Week 1, Day 1.
   const nextWorkout = activeProgram.days[0];

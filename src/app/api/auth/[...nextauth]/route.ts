@@ -8,7 +8,7 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         if (!credentials?.password) return null;
         
         // Single user check. In production, use env var.

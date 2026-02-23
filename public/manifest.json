@@ -1,0 +1,16 @@
+{
+  "name": "Workout Tracker",
+  "short_name": "Lifting Log",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0ea5e9",
+  "description": "Mobile-first workout tracker for Daniel's 12-week program.",
+  "icons": [
+    {
+      "src": "/vercel.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { activeProgram } from '../../../programs';
 import { RestTimer } from '../../../components/RestTimer';
-import { ArrowLeft, CheckCircle, Clock } from 'lucide-react';
+import { ArrowLeft, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -28,14 +28,19 @@ export default function WorkoutPage({ params }: { params: { id: string } }) {
   // Load progress from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem(`workout_progress_${params.id}`);
-    if (saved) {
-      try {
-        setLogs(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to load progress", e);
+    if (!saved) return;
+
+    try {
+      const parsed: SetLog[] = JSON.parse(saved);
+      if (parsed.length) {
+        // initialize state once on mount without cascading renders
+        setLogs(parsed);
       }
+    } catch (e) {
+      console.error("Failed to load progress", e);
     }
-  }, [params.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Save progress
   useEffect(() => {
@@ -84,7 +89,7 @@ export default function WorkoutPage({ params }: { params: { id: string } }) {
       </div>
 
       <div className="p-4 space-y-6 max-w-md mx-auto">
-        {day.exercises.map((exercise, i) => (
+        {day.exercises.map((exercise) => (
           <div key={exercise.key} className="bg-card border rounded-xl overflow-hidden shadow-sm">
             <div className="bg-muted/30 px-4 py-3 border-b flex justify-between items-start">
               <div>
@@ -107,8 +112,6 @@ export default function WorkoutPage({ params }: { params: { id: string } }) {
 
               {exercise.sets.map((set, setIdx) => {
                 const log = getLog(exercise.key, setIdx);
-                const isLogged = !!log;
-                
                 return (
                   <SetRowComponent 
                     key={set.key}
@@ -147,7 +150,18 @@ export default function WorkoutPage({ params }: { params: { id: string } }) {
 }
 
 // Inner Component for Row Logic
-function SetRowComponent({ index, target, log, onSave }: { index: number, target: any, log?: SetLog, onSave: (d: any) => void }) {
+interface SetRowProps {
+  index: number;
+  target: {
+    reps: string;
+    suggestedRpe?: number;
+    restSeconds?: number;
+  };
+  log?: SetLog;
+  onSave: (d: { weight: number; reps: number; rpe?: number }) => void;
+}
+
+function SetRowComponent({ index, target, log, onSave }: SetRowProps) {
   const [weight, setWeight] = useState(log?.weight?.toString() || '');
   const [reps, setReps] = useState(log?.reps?.toString() || target.reps.toString().replace(/[^\d]/g, '')); 
   const [rpe, setRpe] = useState(log?.rpe?.toString() || '');
@@ -203,7 +217,7 @@ function SetRowComponent({ index, target, log, onSave }: { index: number, target
       <input 
         type="number" 
         inputMode="decimal"
-        placeholder={target.suggestedRpe || "-"}
+        placeholder={target.suggestedRpe?.toString() ?? "-"}
         value={rpe}
         onChange={(e) => setRpe(e.target.value)}
         className="w-full bg-background border rounded-md py-2 text-center text-lg font-medium text-muted-foreground focus:ring-2 focus:ring-primary outline-none"
