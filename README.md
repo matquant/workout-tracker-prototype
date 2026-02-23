@@ -46,3 +46,4 @@ To update the program, edit `src/programs/program-v1.ts` or add a new version fi
 3.  Add Vercel Postgres integration.
 4.  Set Environment Variables in Vercel Dashboard.
 5.  Run `npx prisma migrate deploy` during build (or manually).
+FORCE REDEPLOY
